@@ -2,8 +2,12 @@
 // import { MouseEvent } from "react";
 import { useState } from "react";
 
-function ListGroup() {
-  let items = ["New York", "San Francisco", "Tokyo", "London", "Paris"];
+interface Props {
+  items: string[];
+  heading: string;
+}
+
+function ListGroup({ items, heading }: Props) {
   //   items = [];
 //   let selectedIndex = 0;
 
@@ -34,7 +38,7 @@ function ListGroup() {
 
   return (
     <>
-      <h1>List</h1>
+      <h1>{heading}</h1>
       {/* {message} */}
       {/* {getMessage()} */}
       {/* {items.length === 0 ? <p>No item found</p> : null} */}
