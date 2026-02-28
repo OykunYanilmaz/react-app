@@ -5,19 +5,19 @@ import { useState } from "react";
 interface Props {
   items: string[];
   heading: string;
+  onSelectItem: (item: string) => void;
 }
 
-function ListGroup({ items, heading }: Props) {
+function ListGroup({ items, heading, onSelectItem }: Props) {
   //   items = [];
-//   let selectedIndex = 0;
+  //   let selectedIndex = 0;
 
   // Hook
-//   const arr = useState(-1);
-//   arr[0] // variable (selectedIndex)
-//   arr[1] // updater function
+  //   const arr = useState(-1);
+  //   arr[0] // variable (selectedIndex)
+  //   arr[1] // updater function
 
   const [selectedIndex, setSelectedIndex] = useState(-1);
-
 
   //   const message = items.length === 0 ? <p>No item found</p> : null;
 
@@ -34,7 +34,7 @@ function ListGroup({ items, heading }: Props) {
   //     );
 
   // Event Handler
-//   const handleClick = (event:MouseEvent) => console.log(event);
+  //   const handleClick = (event:MouseEvent) => console.log(event);
 
   return (
     <>
@@ -46,12 +46,19 @@ function ListGroup({ items, heading }: Props) {
       <ul className="list-group">
         {items.map((item, index) => (
           <li
-            className={ selectedIndex === index ? 'list-group-item active' : 'list-group-item' }
+            className={
+              selectedIndex === index
+                ? "list-group-item active"
+                : "list-group-item"
+            }
             key={item}
             // onClick={(event) => console.log(item, index, event)}
             // onClick={handleClick}
             // onClick={() => { selectedIndex = index; }}
-            onClick={() => { setSelectedIndex(index); }}
+            onClick={() => {
+              setSelectedIndex(index);
+              onSelectItem(item);
+            }}
           >
             {item}
           </li>
