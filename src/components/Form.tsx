@@ -1,7 +1,7 @@
 // import React from "react";
 // import type { FormEvent } from "react"; // Deprecated ??
-
 import { useRef, useState } from "react";
+import { useForm, type FieldValues } from "react-hook-form";
 
 const Form = () => {
   // Deprecated ??
@@ -16,21 +16,26 @@ const Form = () => {
   //   const person = { name: "", age: 0 };
 
   // State Hook
-  const [person, setPerson] = useState({
-    name: "",
-    age: "",
-  });
+  //   const [person, setPerson] = useState({
+  //     name: "",
+  //     age: "",
+  //   });
 
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // Ref Hook
-    // if (nameRef.current !== null) person.name = nameRef.current.value;
-    // if (ageRef.current !== null) person.age = parseInt(ageRef.current.value);
-    // console.log(person);
+  const { register, handleSubmit } = useForm();
+  //   console.log(register('name'));
 
-    // State Hook
-    console.log(person);
-  };
+  //   const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+  //     event.preventDefault();
+  //     // Ref Hook
+  //     // if (nameRef.current !== null) person.name = nameRef.current.value;
+  //     // if (ageRef.current !== null) person.age = parseInt(ageRef.current.value);
+  //     // console.log(person);
+
+  //     // State Hook
+  //     // console.log(person);
+  //   };
+
+  const onSubmit = (data: FieldValues) => console.log(data);
 
   return (
     <form
@@ -38,7 +43,7 @@ const Form = () => {
       //     event.preventDefault();
       //     console.log("Submitted");
       //   }}
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
     >
       <div className="mb-3">
         <label htmlFor="name" className="form-label">
@@ -46,10 +51,11 @@ const Form = () => {
         </label>
         {/* <input ref={nameRef} id="name" type="text" className="form-control" /> */}
         <input
-          onChange={(event) =>
-            setPerson({ ...person, name: event.target.value })
-          }
-          value={person.name}
+          //   onChange={(event) =>
+          //     setPerson({ ...person, name: event.target.value })
+          //   }
+          //   value={person.name}
+          {...register("name")}
           id="name"
           type="text"
           className="form-control"
@@ -61,10 +67,11 @@ const Form = () => {
         </label>
         {/* <input ref={ageRef} id="age" type="number" className="form-control" /> */}
         <input
-          onChange={(event) =>
-            setPerson({ ...person, age: parseInt(event.target.value) })
-          }
-          value={person.age}
+          //   onChange={(event) =>
+          //     setPerson({ ...person, age: parseInt(event.target.value) })
+          //   }
+          //   value={person.age}
+          {...register("age")}
           id="age"
           type="number"
           className="form-control"
