@@ -3,6 +3,11 @@
 import { useRef, useState } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
 
+interface FormData {
+  name: string;
+  age: number;
+}
+
 const Form = () => {
   // Deprecated ??
   //   const handleSubmit2 = (event: FormEvent) => {
@@ -21,7 +26,11 @@ const Form = () => {
   //     age: "",
   //   });
 
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
   //   console.log(register('name'));
 
   //   const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
@@ -55,11 +64,17 @@ const Form = () => {
           //     setPerson({ ...person, name: event.target.value })
           //   }
           //   value={person.name}
-          {...register("name")}
+          {...register("name", { required: true, minLength: 3 })}
           id="name"
           type="text"
           className="form-control"
         />
+        {errors.name?.type === "required" && (
+          <p className="text-danger">The name field is required.</p>
+        )}
+        {errors.name?.type === "minLength" && (
+          <p className="text-danger">The name must be at least 3 characters.</p>
+        )}
       </div>
       <div className="mb-3">
         <label htmlFor="age" className="form-label">
