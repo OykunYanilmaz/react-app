@@ -1,44 +1,25 @@
-import { useEffect, useRef, useState } from "react";
-import ProductList from "./expense-tracker/components/ProductList";
+import axios from "axios";
+import { useEffect, useState } from "react";
+
+interface User {
+  id: number;
+  name: string;
+}
 
 function App() {
-  const [category, setCategory] = useState("");
-
-  const ref = useRef<HTMLInputElement>(null);
-
-  //afterRender
-  useEffect(() => {
-    // Side effect
-    if (ref.current) ref.current.focus();
-  });
+  const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    document.title = "My App - Oykun";
-  });
-
-  const connect = () => console.log("Connecting");
-  const disconnect = () => console.log("Disconnecting");
-
-  useEffect(() => {
-    connect();
-
-    return () => disconnect();
-  });
+    axios.get<User[]>("https://jsonplaceholder.typicode.com/users")
+        //  .then(response => console.log(response.data[0].name));
+         .then(response => setUsers(response.data));
+  }, []);
 
   return (
     <div>
-      <input ref={ref} type="text" className="form-control" />
-      <br />
-      <br />
-      <select
-        className="form-select"
-        onChange={(event) => setCategory(event.target.value)}
-      >
-        <option value=""></option>
-        <option value="Clothing">Clothing</option>
-        <option value="Household">Household</option>
-      </select>
-      <ProductList category={category} />
+      <ul>
+        {users.map(user => <li key={user.id}>{user.name}</li>)}
+      </ul>
     </div>
   );
 }
