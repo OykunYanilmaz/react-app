@@ -1,11 +1,6 @@
-import { use, useEffect, useState, useSyncExternalStore } from "react";
-import apiClient, { CanceledError } from "./services/api-client";
-
-
-interface User {
-  id: number;
-  name: string;
-}
+import { useEffect, useState } from "react";
+import { CanceledError } from "./services/api-client";
+import userService, { type User } from "./services/user-service";
 
 function App() {
   const [users, setUsers] = useState<User[]>([]);
@@ -14,16 +9,12 @@ function App() {
 
   // Handling errors with chaining
   useEffect(() => {
-    const controller = new AbortController();
-
     setLoading(true);
 
     // get -> promise -> response / err
-    apiClient
-      .get<User[]>("/users", {
-        signal: controller.signal,
-      })
-      //  .then(response => console.log(response.data[0].name));
+    const { request, cancel } = userService.getAll<User>();
+    //  .then(response => console.log(response.data[0].name));
+    request
       .then((response) => {
         setUsers(response.data);
         setLoading(false);
@@ -34,7 +25,7 @@ function App() {
         setLoading(false);
       });
 
-    return () => controller.abort();
+    return () => cancel();
   }, []);
 
   // Handling errors with async and await
@@ -56,56 +47,71 @@ function App() {
   //   fetchUsers();
   // }, []);
 
+  // Delete, Create/Add, Update
   const deleteUser = (user: User) => {
     const originalUsers = [...users];
-    setUsers(users.filter(u => u.id !== user.id))
+    setUsers(users.filter((u) => u.id !== user.id));
 
-    apiClient.delete("/users/" + user.id)
-         .catch(err => {
-            setError(err.message);
-            setUsers(originalUsers);
-         })
+    userService.delete(user.id).catch((err) => {
+      setError(err.message);
+      setUsers(originalUsers);
+    });
   };
 
   const addUser = () => {
     const originalUsers = [...users];
-    const newUser = {id: 0, name: 'Mosh'};
-    setUsers([newUser, ...users])
+    const newUser = { id: 0, name: "Mosh" };
+    setUsers([newUser, ...users]);
 
-    apiClient.post("/users", newUser)
-        //  .then(res => setUsers([res.data, ...users]));
-         .then(({data: savedUser}) => setUsers([savedUser, ...users]))
-         .catch(err => {
-            setError(err.message);
-            setUsers(originalUsers);
-         })
+    userService
+      .create(newUser)
+      //  .then(res => setUsers([res.data, ...users]));
+      .then(({ data: savedUser }) => setUsers([savedUser, ...users]))
+      .catch((err) => {
+        setError(err.message);
+        setUsers(originalUsers);
+      });
   };
 
   const updateUser = (user: User) => {
     const originalUsers = [...users];
-    const updatedUser = {...user, name: user.name + '!'};
-    setUsers(users.map(u => u.id === user.id ? updatedUser : u));
+    const updatedUser = { ...user, name: user.name + "!" };
+    setUsers(users.map((u) => (u.id === user.id ? updatedUser : u)));
 
-    apiClient.patch("/users/" + user.id, updatedUser)
-         .catch(err => {
-            setError(err.message);
-            setUsers(originalUsers);
-         })
-  }
+    userService.update(updatedUser).catch((err) => {
+      setError(err.message);
+      setUsers(originalUsers);
+    });
+  };
 
   return (
     <>
       {error && <p className="text-danger">{error}</p>}
       {isLoading && <div className="spinner-border"></div>}
-      <button className="btn btn-primary mb-3" onClick={addUser}>Add</button>
+      <button className="btn btn-primary mb-3" onClick={addUser}>
+        Add
+      </button>
       <div>
         <ul className="list-group">
           {users.map((user) => (
-            <li className="list-group-item d-flex justify-content-between" key={user.id}>
+            <li
+              className="list-group-item d-flex justify-content-between"
+              key={user.id}
+            >
               {user.name}
               <div>
-                <button className="btn btn-outline-secondary mx-1" onClick={() => updateUser(user)}>Update</button>
-                <button className="btn btn-outline-danger" onClick={() => deleteUser(user)}>Delete</button>
+                <button
+                  className="btn btn-outline-secondary mx-1"
+                  onClick={() => updateUser(user)}
+                >
+                  Update
+                </button>
+                <button
+                  className="btn btn-outline-danger"
+                  onClick={() => deleteUser(user)}
+                >
+                  Delete
+                </button>
               </div>
             </li>
           ))}
